@@ -1,13 +1,13 @@
 html { min-width: 600px; }
 
 body {
-	font-size: 12px;
-    font-family: verdana,sans-serif;
+	font-size: 14px;
+    font-family: open sans,roboto,sans-serif;
 }
 
 div, caption, td, th, h2, h3, h4 { /* redundant rules for bad browsers  */  
-	font-size: 12px;
-    font-family: verdana,sans-serif;
+	font-size: 14px;
+    font-family: open sans,roboto,sans-serif;
 	voice-family: "\"}\"";
 	voice-family: inherit;
 	color: #333;
@@ -15,7 +15,7 @@ div, caption, td, th, h2, h3, h4 { /* redundant rules for bad browsers  */
 .clearhack { display: inline; } /*Clears Box Model Hack in IE5*/
 
 body {
-	background: #99cccc;
+	background: #fff;
 	color: #333;
 	margin: 0; /* margin and padding only necessary to cater for Mac IE5 */
 	padding: 0;
@@ -95,4 +95,71 @@ html, body {
 .footer, .push {
        height: 4em;
 }
+#footer {
+	text-align: center;
+}
 
+body {
+  background-color: #000000;
+}
+
+
+.text-danger {
+	color: firebrick;
+}
+
+.text-success {
+	color: green;
+}
+
+.text-sexess {
+	color: mediumseagreen;
+	font-weight: bold;
+}
+
+
+.text-muted {
+	color: lightgrey;
+}
+
+.text-info {
+	color: royalblue;
+}
+
+.text-warning {
+	color: orange;
+}
+
+.text-peru {
+	color: peru;
+}
+
+.text-sadbrown {
+	color: saddlebrown;
+}
+
+
+.text-rblue {
+	color: royalblue;
+}
+
+.text-dimgray {
+	color: dimgray;
+}
+
+.text-indred {
+	color: indianred;
+	font-weight: bold;
+
+}
+
+.btn-danger {
+	color: white;
+	background-color: firebrick;
+	font-family: "Times New Roman", Times, serif;
+	font-size: .9rem;
+}
+/* Give the player a height & width of 0. Otherwise the player is visible on mobile devices (tested on iPhone 5). */
+/*#player {
+ width: 100%;
+}​*/

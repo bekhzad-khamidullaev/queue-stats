@@ -50,18 +50,19 @@ if(isset($_POST['queue'])) {
 }
 */
 
+
 if(isset($_POST['start'])) {
    $start = $_POST['start'];
    $_SESSION['QSTATS']['start']=$start;
 } else {
-   $start = date('Y-m-d');
+   $start = date('Y-m-d 00:00:00');
 }
 
 if(isset($_POST['end'])) {
    $end = $_POST['end'];
    $_SESSION['QSTATS']['end']=$end;
 } else {
-   $end = date('Y-m-d');
+   $end = date('Y-m-d 23:59:59');
 }
 
 if(isset($_SESSION['QSTATS']['start'])) {
@@ -84,17 +85,15 @@ $fstart_year  = substr($start,0,4);
 $fstart_month = substr($start,5,2);
 $fstart_day = substr($start,8,2);
 
-
 $fend_year  = substr($end,0,4);
 $fend_month = substr($end,5,2);
 $fend_day = substr($end,8,2);
 
-
 $timestamp_start = return_timestamp($start);
 $timestamp_end   = return_timestamp($end);
 $elapsed_seconds = $timestamp_end - $timestamp_start;
-//$period          = floor(($elapsed_seconds / 60) / 60 / 24) + 1; 
-$period          = floor(($elapsed_seconds / 60) /60) + 1; 
+$period          = floor(($elapsed_seconds / 60) / 60 / 24) + 1; 
+
 
 if(!isset($_SESSION['QSTATS']['start'])) {
 	if(basename($self)<>"index.php") {

@@ -1,22 +1,31 @@
-/*
-=====================================
- * Data Tables and Cascading Style Sheets Gallery *
- *  http://icant.co.uk/csstablegallery/index.php  *
- * Author: Velizar Garvalov at  http://www.vhg-design.com/ *
- =====================================
-*/
-
 table {
-	width: 99%;
-	margin:0; 
- 	padding:0;
-	font-family: "Trebuchet MS", Trebuchet, Arial, sans-serif;	
-	color: #1c5d79;
-	
+    font-family: open sans,roboto,sans-serif;
+    border-collapse: collapse;
+    width: 99%;
 }
-table, tr, th, td {
-	border-collapse: collapse;
+
+@media (max-width:800px) { 
+table.centered {
+  font-family: open sans,roboto,sans-serif;
+  font-size: x-large;
+  border-collapse: collapse;
+    margin-right: 20%;
+    margin-left: 20%;
+  width: 59%;
+ }
 }
+
+@media (min-width:800px) { 
+table.centered {
+  font-family: open sans,roboto,sans-serif;	
+  border-collapse: collapse;
+    margin-right: 10%;
+    margin-left: 10%;
+  width: 80%;
+ }
+}
+
+
 caption {
 	margin:0; 
  	padding:0;
@@ -24,54 +33,54 @@ caption {
 	height: 40px;
 	line-height: 40px;
 	text-indent: 2px;
-	font-family: "Trebuchet MS", Trebuchet, Arial, sans-serif;	
+	font-family: open sans,roboto,sans-serif;
 	font-size: 140%;
 	font-weight: bold;
 	color: #000;
 	text-align: left;
 	letter-spacing: 1px;
-	border-top: dashed 1px #c2c2c2;
-	border-bottom: dashed 1px #c2c2c2;
+	border-top: none;
+	border-bottom: none;
 }
 
 /* HEAD */
 
 thead {
-	background-color: #FFFFFF;
+	background-color: #fff;
 	border: none;
 }
 thead tr th {
 	height: 32px;
-	aline-height: 32px;
+	background: #607D8B;
+	color: white;
 	text-align: center;
-	color: #1c5d79;
-	background-image: url(../images/col_bg.gif);
-	background-repeat: repeat;
-	border-left:solid 1px #FF9900;
-	border-right:solid 1px #FF9900;	
+	word-wrap: break-word;
+	white-space: pre-wrap;
 	border-collapse: collapse;
-	
 }
-
 /* BODY */
 
 tbody tr {
-	background: #dfedf3;
+	background: #fff;
 	font-size: 110%;
+	text-align: center;
+	border: 1px solid black;
 }
 tbody tr.odd {
-	background: #F0FFFF;
+	background: #fff;
 }
-tbody tr:hover, tbody tr.odd:hover {
-	background: #ffffff;
-}
+tbody tr:hover  {background-color: #ddd;}
+
+tbody tr:nth-child(even){background-color: #f2f2f2;}
+
 tbody tr th, tbody tr td {
 	padding: 6px;
-	border: solid 1px #326e87;
+	border: none; /*solid 1px #326e87;*/
+	border: 1px solid black;
 }
 tbody tr th {
 	background: #1c5d79;
-	font-family: "Trebuchet MS", Trebuchet, Arial, sans-serif;	
+	font-family: open sans,roboto,sans-serif;	
 	font-size: 100%;
 	padding: 6px;
 	text-align: center;
@@ -79,10 +88,9 @@ tbody tr th {
 	color: #FFFFFF;
 	border-bottom: solid 1px white;
 }
-tbody tr th:hover {
-	background: #ffffff;
-
-}
+/*tbody tr audio {
+background-color: rgb(0, 0, 0);
+}*/
 
 /* LINKS */
 
@@ -90,12 +98,11 @@ table a {
 	color: #FF6600;
 	text-decoration: none;
 	font-size: 110%;
-	//border-bottom: solid 1px white;
 }
-table a:hover {
+/*table a:hover {
 	color: #FF9900;
 	border-bottom: none;
-}
+}*/
 
 /* FOOTER */
 
@@ -103,7 +110,7 @@ tfoot {
 	background: #f3f3f3;
 	height: 24px;
 	line-height: 24px;
-	font-family: "Trebuchet MS", Trebuchet, Arial, sans-serif;	
+	font-family: open sans,roboto,sans-serif;	
 	font-size: 120%;
 	font-weight: bold;
 	color: #555d6d;
@@ -128,8 +135,7 @@ tfoot tr td {
 table.sortable a.sortheader {
     text-decoration: none;
     display: block;
-	color: #1c5d79;
-	xcolor: #000000;
+	color: #fff;
 }
 table.sortable span.sortarrow {
     color: black;

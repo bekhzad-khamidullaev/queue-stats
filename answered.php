@@ -1,239 +1,99 @@
 <?php
-/*COMPLETEAGENT
-   Copyright 2007, 2008 Nicolás Gudiño
+/*
+Copyright 2017, https://asterisk-pbx.ru
 
-   This file is part of Asternic Call Center Stats.
+This file is part of Asterisk Call Center Stats.
+Asterisk Call Center Stats is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-    Asternic Call Center Stats is free software: you can redistribute it 
-    and/or modify it under the terms of the GNU General Public License as 
-    published by the Free Software Foundation, either version 3 of the 
-    License, or (at your option) any later version.
+Asterisk Call Center Stats is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    Asternic Call Center Stats is distributed in the hope that it will be 
-    useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Asternic Call Center Stats.  If not, see 
-    <http://www.gnu.org/licenses/>.
-*/
-require_once("config.php");
-include("sesvars.php");
+You should have received a copy of the GNU General Public License
+along with Asterisk Call Center Stats.  If not, see
+<http://www.gnu.org/licenses/>.
+ */
+require_once "config.php";
+include "sesvars.php";
+//ini_set('display_errors',1);
+//error_reporting(E_WARNING);
 ?>
-<!-- http://www.house.com.ar/quirksmode -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Asternic Call Center Stats</title>
+    <title>Asterisk Call Center Stats</title>
     <style type="text/css" media="screen">@import "css/basic.css";</style>
     <style type="text/css" media="screen">@import "css/tab.css";</style>
     <style type="text/css" media="screen">@import "css/table.css";</style>
     <style type="text/css" media="screen">@import "css/fixed-all.css";</style>
-    <script type="text/javascript" src="js/flashobject.js"></script>
-    <script type="text/javascript" src="js/sorttable.js"></script>
-
-<!--[if gte IE 5.5000]>
-<style type='text/css'> img { behavior:url(pngbehavior.htc) } </style>
-<![endif]-->
-
-<!--[if IE]>
-<link 
- href="css/fixed-ie.css" 
- rel="stylesheet" 
- type="text/css" 
- media="screen"> 
-<script type="text/javascript"> 
-onload = function() { content.focus() } 
-</script> 
-<![endif]-->
+	<script type="text/javascript" src="js/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/sorttable.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 </head>
 <?php
-
-$graphcolor2 = "&bgcolor=0xF0ffff&bgcolorchart=0xdfedf3&fade1=0xff6600&fade2=0x528252&colorbase=0xfff3b3&reverse=1";
-$graphcolor  = "&bgcolor=0xF0ffff&bgcolorchart=0xdfedf3&fade1=0xff6600&fade2=0xff6600&colorbase=0xfff3b3&reverse=1";
-// This query shows the hangup cause, how many calls an
-// agent hanged up, and a caller hanged up.
-$query = "SELECT COUNT(event) AS num, event AS action  FROM queue_log ";
-$query.= "WHERE time >= '$start' AND time <= '$end' AND queuename IN ($queue) ";
-$query.= "AND event IN ('COMPLETECALLER', 'COMPLETEAGENT') GROUP BY event ORDER BY time";
-
-$hangup_cause["COMPLETECALLER"]=0;
-$hangup_cause["COMPLETEAGENT"]=0;
-$res = consulta_db($query,$DB_DEBUG,$DB_MUERE,0,$midb);
-while($row=db_fetch_row($res)) {
-  $hangup_cause["$row[1]"]=$row[0];
-  $total_hangup+=$row[0];
-}
-
-//service level
-$query = "SELECT time, queuename, agent, event, data1, data2, data3 ";
-$query.= "FROM queue_log WHERE time >= '$start' AND time <= '$end' ";
-$query.= "AND queuename IN ($queue) AND agent in ($agent) AND event IN ('COMPLETECALLER','COMPLETEAGENT','TRANSFER','CONNECT') ORDER BY time";
-
-$answer["15"]=0;
-$answer["30"]=0;
-$answer["45"]=0;
-$answer["60"]=0;
-$answer["75"]=0;
-$answer["90"]=0;
-$answer["91+"]=0;
-
-$abandoned         = 0;
-$transferidas      = 0;
-$totaltransfers    = 0;
-$total_hangup      = 0;
-$total_calls       = 0;
-$total_calls2      = Array();
-$total_duration    = 0;
-$total_calls_queue = Array();
-
-$res = consulta_db($query,$DB_DEBUG,$DB_MUERE,0,$midb);
-if($res) {
-    while($row=db_fetch_row($res)) {
-        if($row[3] <> "TRANSFER" && $row[3]<>"CONNECT") {
-            $total_hold     += $row[4];
-            $total_duration += $row[5];
-            $total_calls++;
-            $total_calls_queue["$row[1]"]++;
-        } elseif($row[3]=="TRANSFER") {
-            $transferidas++;
-        }
-        if($row[3]=="CONNECT") {
-
-            if ($row[4] >=0 && $row[4] <= 15) {
-                $answer["15"]++;
-            }
-
-            if ($row[4] >=16 && $row[4] <= 30) {
-                $answer["30"]++;
-            }
-
-            if ($row[4] >=31 && $row[4] <= 45) {
-              $answer["45"]++;
-            }
-
-            if ($row[4] >=46 && $row[4] <= 60) {
-              $answer["60"]++;
-            }
-
-            if ($row[4] >=61 && $row[4] <= 75) {
-              $answer["75"]++;
-            }
-
-            if ($row[4] >=76 && $row[4] <= 90) {
-              $answer["90"]++;
-            }
-
-            if ($row[4] >=91) {
-              $answer["91+"]++;
-            }
-        }
-    }
-} 
-
-if($total_calls > 0) {
-    ksort($answer);
-    $average_hold     = $total_hold     / $total_calls;
-    $average_duration = $total_duration / $total_calls;
-    $average_hold     = number_format($average_hold     , 2);
-    $average_duration = number_format($average_duration , 2);
-} else {
-    // There were no calls
-    $average_hold = 0;
-    $average_duration = 0;
-}
-
-$total_duration_print = seconds2minutes($total_duration);
-// TRANSFERS
-$query = "SELECT agent, data1, data2 FROM queue_log ";
-$query.= "WHERE time >= '$start' AND time <= '$end' ";
-$query.= "AND queuename IN ($queue) AND agent in ($agent) AND event = 'TRANSFER'";
-
-
-$res = consulta_db($query,$DB_DEBUG,$DB_MUERE,0,$midb);
-if($res) {
-    while($row=db_fetch_row($res)) {
-        $keytra = "$row[0]^$row[1]@$row[2]";
-        $transfers["$keytra"]++;
-        $totaltransfers++;
-    }
-} else {
-   $totaltransfers=0;
-}
-
-// ABANDONED CALLS
-$query = "SELECT event, data1, data2, data3 FROM queue_log ";
-$query.= "WHERE time >= '$start' AND time <= '$end' AND queuename IN ($queue) "; 
-$query.= "AND agent IN ($agent) AND  event IN ('ABANDON', 'EXITWITHTIMEOUT', 'TRANSFER') ";
-$query.= "ORDER BY event, data3";
-
-$res = consulta_db($query,$DB_DEBUG,$DB_MUERE,0,$midb);
-
-while($row=db_fetch_row($res)) {
-
-    if($row[0]=="ABANDON") {
-         $abandoned++;
-        $abandon_end_pos+=$row[1];
-        $abandon_start_pos+=$row[2];
-        $total_hold_abandon+=$row[3];
-    }
-    if($row[0]=="EXITWITHTIMEOUT") {
-         $timeout++;
-        $timeout_end_pos+=$row[1];
-        $timeout_start_pos+=$row[2];
-        $total_hold_timeout+=$row[3];
-    }
-}
-
-if($abandoned > 0) {
-    $abandon_average_hold = $total_hold_abandon / $abandoned;
-    $abandon_average_hold = number_format($abandon_average_hold,2);
-
-    $abandon_average_start = floor($abandon_start_pos / $abandoned);
-    $abandon_average_start = number_format($abandon_average_start,2);
-
-    $abandon_average_end = floor($abandon_end_pos / $abandoned);
-    $abandon_average_end = number_format($abandon_average_end,2);
-} else {
-    $abandoned = 0;
-    $abandon_average_hold  = 0;
-    $abandon_average_start = 0;
-    $abandon_average_end   = 0;
-}
-
 // This query shows every call for agents, we collect into a named array the values of holdtime and calltime
-$query = "SELECT time, queuename, agent, event, data1, data2, data3 FROM queue_log ";
-$query.= "WHERE time >= '$start' AND time <= '$end' ";
-$query.= "AND queuename IN ($queue) AND agent in ($agent) AND event IN ('COMPLETECALLER', 'COMPLETEAGENT') ORDER BY agent";
+$query = "SELECT time, queuename, agent, event, data1, data2, data3 FROM $DBTable
+WHERE time >= '$start' AND time <= '$end' AND event IN ('COMPLETECALLER', 'COMPLETEAGENT')
+AND queuename IN ($queue) AND agent in ($agent)";
 
-$res = consulta_db($query,$DB_DEBUG,$DB_MUERE,0,$midb);
-while($row=db_fetch_row($res)) {
-    $total_calls2["$row[2]"]++;
-    $record["$row[2]"][]=$row[0]."|".$row[1]."|".$row[3]."|".$row[4];
-    $total_hold2["$row[2]"]+=$row[4];
-    $total_time2["$row[2]"]+=$row[5];
-    $grandtotal_hold+=$row[4];
-    $grandtotal_time+=$row[5];
-    $grandtotal_calls++;
+$res = mysqli_query($connection, $query);
+while ($row = mysqli_fetch_row($res)) {
+	$total_calls2["$row[2]"]++;
+	$record["$row[2]"][] = $row[0] . "|" . $row[1] . "|" . $row[3] . "|" . $row[4];
+	$total_hold2["$row[2]"] += $row[4];
+	$total_time2["$row[2]"] += $row[5];
+	$grandtotal_hold += $row[4];
+	$grandtotal_time += $row[5];
+	$grandtotal_calls++;
+	$hold["$row[1]"][] = $row[4];
+	if ($row[4] <= 5) {
+		$hold15["$row[1]"] += count($row[4]);
+	} elseif (($row[4] >= 6) && ($row[4] <= 10)) {
+		$hold30["$row[1]"] += count($row[4]);
+	} elseif (($row[4] >= 11) && ($row[4] <= 15)) {
+		$hold45["$row[1]"] += count($row[4]);
+	} elseif (($row[4] >= 16) && ($row[4] <= 20)) {
+		$hold60["$row[1]"] += count($row[4]);
+	} elseif (($row[4] >= 21) && ($row[4] <= 25)) {
+		$hold75["$row[1]"] += count($row[4]);
+	} elseif (($row[4] >= 26) && ($row[4] <= 30)) {
+		$hold90["$row[1]"] += count($row[4]);
+	} elseif ($row[4] >= 31) {
+		$hold91["$row[1]"] += count($row[4]);
+	}
+	$durall["$row[1]"][] = $row[5];
+	if ($row[5] <= 5) {
+		$dur5["$row[1]"] += count($row[5]);
+	} elseif (($row[5] >= 6) && ($row[5] <= 10)) {
+		$dur10["$row[1]"] += count($row[5]);
+	} elseif (($row[5] >= 11) && ($row[5] <= 15)) {
+		$dur15["$row[1]"] += count($row[5]);
+	} elseif (($row[5] >= 16) && ($row[5] <= 20)) {
+		$dur20["$row[1]"] += count($row[5]);
+	} elseif (($row[5] >= 21) && ($row[5] <= 25)) {
+		$dur25["$row[1]"] += count($row[5]);
+	}
 }
+$total_calls_print = array_sum($total_calls2);
+$total_duration_print = ceil(array_sum($total_time2) / 60);
+$average_duration = ceil(array_sum($total_time2) / $total_calls_print);
+$average_hold = ceil(array_sum($total_hold2) / $total_calls_print);
 
 $start_parts = explode(" ,:", $start);
-$end_parts   = explode(" ,:", $end);
+$end_parts = explode(" ,:", $end);
 
-$cover_pdf = $lang["$language"]['queue'].": ".$queue."\n";
-$cover_pdf.= $lang["$language"]['start'].": ".$start_parts[0]."\n";
-$cover_pdf.= $lang["$language"]['end'].": ".$end_parts[0]."\n";
-$cover_pdf.= $lang["$language"]['period'].": ".$period." ".$lang["$language"]['hours']."\n\n";
-$cover_pdf.= $lang["$language"]['answered_calls'].": ".$total_calls." ".$lang["$language"]['calls']."\n";
-$cover_pdf.= $lang["$language"]['avg_calltime'].": ".$average_duration." ".$lang["$language"]['secs']."\n";
-$cover_pdf.= $lang["$language"]['total'].": ".$total_duration_print." ".$lang["$language"]['minutes']."\n";
-$cover_pdf.= $lang["$language"]['avg_holdtime'].": ".$average_hold." ".$lang["$language"]['secs']."\n";
-
+mysqli_close($connection);
 ?>
+
 <body>
-<?php include("menu.php"); ?>
+<?php include "menu.php";?>
 <div id="main">
     <div id="contents">
         <TABLE width='99%' cellpadding=3 cellspacing=3 border=0>
@@ -241,24 +101,24 @@ $cover_pdf.= $lang["$language"]['avg_holdtime'].": ".$average_hold." ".$lang["$l
         <TR>
             <TD valign=top width='50%'>
                 <TABLE width='100%' border=0 cellpadding=0 cellspacing=0>
-                <CAPTION><?php echo $lang["$language"]['report_info']?></CAPTION>
+                <CAPTION><?php echo $lang["$language"]['report_info'] ?></CAPTION>
                 <TBODY>
                 <TR>
-                    <TD><?php echo $lang["$language"]['queue']?>:</TD>
-                    <TD><?php echo $queue?></TD>
+                    <TD><?php echo $lang["$language"]['queue'] ?>:</TD>
+                    <TD><?php echo $queue ?></TD>
                 </TR>
                 </TR>
-                       <TD><?php echo $lang["$language"]['start']?>:</TD>
-                       <TD><?php echo $start_parts[0]?></TD>
+                       <TD><?php echo $lang["$language"]['start'] ?>:</TD>
+                       <TD><?php echo $start_parts[0] ?></TD>
                 </TR>
                 </TR>
                 <TR>
-                       <TD><?php echo $lang["$language"]['end']?>:</TD>
-                       <TD><?php echo $end_parts[0]?></TD>
+                       <TD><?php echo $lang["$language"]['end'] ?>:</TD>
+                       <TD><?php echo $end_parts[0] ?></TD>
                 </TR>
                 <TR>
-                       <TD><?php echo $lang["$language"]['period']?>:</TD>
-                       <TD><?php echo $period?> <?php echo $lang["$language"]['hours']?></TD>
+                       <TD><?php echo $lang["$language"]['period'] ?>:</TD>
+                       <TD><?php echo $period ?> <?php echo $lang["$language"]['days'] ?></TD>
                 </TR>
                 </TBODY>
                 </TABLE>
@@ -267,23 +127,24 @@ $cover_pdf.= $lang["$language"]['avg_holdtime'].": ".$average_hold." ".$lang["$l
             <TD valign=top width='50%'>
 
                 <TABLE width='100%' border=0 cellpadding=0 cellspacing=0>
-                <CAPTION><?php echo $lang["$language"]['answered_calls']?></CAPTION>
+                <CAPTION><?php echo $lang["$language"]['answered_calls'] ?></CAPTION>
                 <TBODY>
-                <TR> 
-                  <TD><?php echo $lang["$language"]['answered_calls']?></TD>
-                  <TD><?php echo $total_calls?> <?php echo $lang["$language"]['calls']?></TD>
+                <TR>
+                  <TD><?php echo $lang["$language"]['answered_calls'] ?></TD>
+                  <TD><?php echo $total_calls_print ?> <?php echo $lang["$language"]['calls'] ?></TD>
+                </TR>
+
+                <TR>
+                  <TD><?php echo $lang["$language"]['avg_calltime'] ?>:</TD>
+                  <TD><?php echo $average_duration ?> <?php echo $lang["$language"]['secs'] ?></TD>
                 </TR>
                 <TR>
-                  <TD><?php echo $lang["$language"]['avg_calltime']?>:</TD>
-                  <TD><?php echo $average_duration?> <?php echo $lang["$language"]['secs']?></TD>
+                  <TD><?php echo $lang["$language"]['total'] ?> <?php echo $lang["$language"]['calltime'] ?>:</TD>
+                  <TD><?php echo $total_duration_print ?> <?php echo $lang["$language"]['minutes'] ?></TD>
                 </TR>
                 <TR>
-                  <TD><?php echo $lang["$language"]['total']?> <?php echo $lang["$language"]['calltime']?>:</TD>
-                  <TD><?php echo $total_duration_print?> <?php echo $lang["$language"]['minutes']?></TD>
-                </TR>
-                <TR>
-                  <TD><?php echo $lang["$language"]['avg_holdtime']?>:</TD>
-                  <TD><?php echo $average_hold?> <?php echo $lang["$language"]['secs']?></TD>
+                  <TD><?php echo $lang["$language"]['avg_holdtime'] ?>:</TD>
+                  <TD><?php echo $average_hold ?> <?php echo $lang["$language"]['secs'] ?></TD>
                 </TR>
                 </TBODY>
               </TABLE>
@@ -292,324 +153,397 @@ $cover_pdf.= $lang["$language"]['avg_holdtime'].": ".$average_hold." ".$lang["$l
         </TR>
         </THEAD>
         </TABLE>
-        <BR>    
-        <a name='1'></a>
-        <TABLE width='99%' cellpadding=3 cellspacing=3 border=0 class='sortable' id='table1' >
+        <?php
+          $cover_pdf .= $lang["$language"]['queue'] . ": " . $queue . "\n";
+          $cover_pdf .= $lang["$language"]['start'] . ": " . $start_parts[0] . "\n";
+          $cover_pdf .= $lang["$language"]['end'] . ": " . $end_parts[0] . "\n";
+          $cover_pdf .= $lang["$language"]['period'] . ": " . $period . " " . $lang["$language"]['days'] . "\n";
+          $cover_pdf .= $lang["$language"]['answered_calls'] . ": " . $total_calls_print . " " . $lang["$language"]['calls'] ."\n";
+          $cover_pdf .= $lang["$language"]['avg_calltime'] . ": " .  $average_duration . " " . $lang["$language"]['secs'] . "\n";
+          $cover_pdf .= $lang["$language"]['total'] . " " . $lang["$language"]['calltime'] . ": " . $total_duration_print . " " . $lang["$language"]['minutes'] . "\n";
+          $cover_pdf .= $lang["$language"]['avg_holdtime'] . ": " . $average_hold . " " . $lang["$language"]['secs'] . "\n";
+        ?>
+        <br/>
+        <a name='summary'></a>
+        <TABLE width='99%' cellpadding=3 cellspacing=3 border=0 class='sortable' id='tablesummary' >
         <CAPTION>
-        <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16 
-        <?php 
-        tooltip($lang["$language"]['gotop'],200);
-        ?> 
+        <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16
+        <?php
+tooltip($lang["$language"]['gotop'], 200);
+?>
         ></a>&nbsp;&nbsp;
-        <?php echo $lang["$language"]['answered_calls_by_agent']?>
+        <?php echo $lang["$language"]['answered_calls_by_agent'] ?>
         </CAPTION>
+		</br>
             <THEAD>
             <TR>
-                  <TH><?php echo $lang["$language"]['agent']?></TH>
-                  <TH><?php echo $lang["$language"]['Calls']?></TH>
-                  <TH><?php echo $lang["$language"]['percent']?> <?php echo $lang["$language"]['Calls']?></TH>
-                  <TH><?php echo $lang["$language"]['calltime']?></TH>
-                  <TH><?php echo $lang["$language"]['percent']?> <?php echo $lang["$language"]['calltime']?></TH>
-                  <TH><?php echo $lang["$language"]['avg']?> <?php echo $lang["$language"]['calltime']?></TH>
-                  <TH><?php echo $lang["$language"]['holdtime']?></TH>
-                  <TH><?php echo $lang["$language"]['avg']?> <?php echo $lang["$language"]['holdtime']?></TH>
+                  <TH><?php echo $lang["$language"]['agent'] ?></TH>
+                  <TH><?php echo $lang["$language"]['Calls'] ?></TH>
+                  <TH><?php echo $lang["$language"]['percent'] ?> <?php echo $lang["$language"]['Calls'] ?></TH>
+                  <TH><?php echo $lang["$language"]['calltime'] ?></TH>
+                  <TH><?php echo $lang["$language"]['percent'] ?> <?php echo $lang["$language"]['calltime'] ?></TH>
+                  <TH><?php echo $lang["$language"]['avg'] ?> <?php echo $lang["$language"]['calltime'] ?></TH>
+                  <TH><?php echo $lang["$language"]['holdtime'] ?></TH>
+                  <TH><?php echo $lang["$language"]['avg'] ?> <?php echo $lang["$language"]['holdtime'] ?></TH>
             </TR>
             </THEAD>
             <TBODY>
                 <?php
-                $header_pdf=array($lang["$language"]['agent'],$lang["$language"]['Calls'],$lang["$language"]['percent'],$lang["$language"]['calltime'],$lang["$language"]['percent'],$lang["$language"]['avg'],$lang["$language"]['holdtime'],$lang["$language"]['avg']);
-                $width_pdf=array(25,23,23,23,23,25,25,20);
-                $title_pdf=$lang["$language"]['answered_calls_by_agent'];
+$header_pdf = array($lang["$language"]['agent'], $lang["$language"]['Calls'], $lang["$language"]['percent'], $lang["$language"]['calltime'], $lang["$language"]['percent'], $lang["$language"]['avg'], $lang["$language"]['holdtime'], $lang["$language"]['avg']);
+$width_pdf = array(64, 32, 32, 32, 32,32, 32, 32);
+$title_pdf = $lang["$language"]['answered_calls_by_agent'];
 
-                $contador=0;
-                $query1 = "";
-                $query2 = "";
-                $data_pdf = array();
-                if($total_calls2>0) {
-                foreach($total_calls2 as $agent=>$val) {
-                    $contavar = $contador +1;
-                    $cual = $contador % 2;
-                    if($cual>0) { $odd = " class='odd' "; } else { $odd = ""; }
-                    $query1 .= "val$contavar=".$total_time2["$agent"]."&var$contavar=$agent&";
-                    $query2 .= "val$contavar=".$val."&var$contavar=$agent&";
+$contador = 0;
+$query1 = "";
+$query2 = "";
+$data_pdf = array();
+if ($total_calls2 > 0) {
+	foreach ($total_calls2 as $agent => $val) {
+		$contavar = $contador + 1;
+		$cual = $contador % 2;
+		if ($cual > 0) {$odd = " class='odd' ";} else { $odd = "";}
+		$query1 .= "val$contavar=" . $total_time2["$agent"] . "&var$contavar=$agent&";
+		$query2 .= "val$contavar=" . $val . "&var$contavar=$agent&";
 
-                    $time_print = seconds2minutes($total_time2["$agent"]);
-                    $avg_time = $total_time2["$agent"] / $val;
-                    $avg_time = round($avg_time,2);
+		$time_print = seconds2minutes($total_time2["$agent"]);
+		$avg_time = $total_time2["$agent"] / $val;
+		$avg_time = round($avg_time, 2);
 
-                    $avg_print = seconds2minutes($avg_time);
+		$avg_print = seconds2minutes($avg_time);
 
-                    echo "<TR $odd>\n";
-                    echo "<TD>$agent</TD>\n";
-                    echo "<TD>$val</TD>\n";
-                    if($grandtotal_calls > 0) {
-                       $percentage_calls = $val * 100 / $grandtotal_calls;
-                    } else {
-                       $percentage_calls = 0;
-                    }
-                    $percentage_calls = number_format($percentage_calls,2);
-                    echo "<TD>$percentage_calls ".$lang["$language"]['percent']."</TD>\n";
-                    echo "<TD>$time_print ".$lang["$language"]['minutes']."</TD>\n";
-                    if($grandtotal_time > 0) {
-                       $percentage_time = $total_time2["$agent"] * 100 / $grandtotal_time;
-                    } else {
-                       $percentage_time = 0;
-                    }
-                    $percentage_time = number_format($percentage_time,2);
-                    echo "<TD>$percentage_time ".$lang["$language"]['percent']."</TD>\n";
-                    //echo "<TD>$avg_time ".$lang["$language"]['secs']."</TD>\n";
-                    echo "<TD>$avg_print ".$lang["$language"]['minutes']."</TD>\n";
-                    echo "<TD>".$total_hold2["$agent"]." ".$lang["$language"]['secs']."</TD>\n";
-                    $avg_hold = $total_hold2["$agent"] / $val;
-                    $avg_hold = number_format($avg_hold,2);
-                    echo "<TD>$avg_hold ".$lang["$language"]['secs']."</TD>\n";
-                    echo "</TR>\n";
+		echo "<TR $odd>\n";
+		echo "<TD>$agent</TD>\n";
+		echo "<TD>$val</TD>\n";
+		if ($grandtotal_calls > 0) {
+			$percentage_calls = $val * 100 / $grandtotal_calls;
+		} else {
+			$percentage_calls = 0;
+		}
+		$percentage_calls = number_format($percentage_calls, 2);
+		echo "<TD>$percentage_calls " . $lang["$language"]['percent'] . "</TD>\n";
+		echo "<TD>$time_print " . $lang["$language"]['minutes'] . "</TD>\n";
+		if ($grandtotal_time > 0) {
+			$percentage_time = $total_time2["$agent"] * 100 / $grandtotal_time;
+		} else {
+			$percentage_time = 0;
+		}
+		$percentage_time = number_format($percentage_time, 2);
+		echo "<TD>$percentage_time " . $lang["$language"]['percent'] . "</TD>\n";
+		//echo "<TD>$avg_time ".$lang["$language"]['secs']."</TD>\n";
+		echo "<TD>$avg_print " . $lang["$language"]['minutes'] . "</TD>\n";
+		echo "<TD>" . $total_hold2["$agent"] . " " . $lang["$language"]['secs'] . "</TD>\n";
+		$avg_hold = $total_hold2["$agent"] / $val;
+		$avg_hold = number_format($avg_hold, 2);
+		echo "<TD>$avg_hold " . $lang["$language"]['secs'] . "</TD>\n";
+		echo "</TR>\n";
 
-                    $linea_pdf = array($agent,$val,"$percentage_calls ".$lang["$language"]['percent'],$total_time2["$agent"],"$percentage_time ".$lang["$language"]['percent'],"$avg_time ".$lang["$language"]['secs'],$total_hold2["$agent"]." ".$lang["$language"]['secs'], "$avg_hold ".$lang["$language"]['secs']);
-                       $data_pdf[]=$linea_pdf;
-                    $contador++;
-                }
-                
-                $query1.="title=".$lang["$language"]['total_time_agent']."$graphcolor";
-                $query2.="title=".$lang["$language"]['no_calls_agent']."$graphcolor";
-                }
-                ?>
+		$linea_pdf = array($agent, $val, "$percentage_calls " . $lang["$language"]['percent'], $total_time2["$agent"], "$percentage_time " . $lang["$language"]['percent'], "$avg_time " . $lang["$language"]['secs'], $total_hold2["$agent"] . " " . $lang["$language"]['secs'], "$avg_hold " . $lang["$language"]['secs']);
+		$data_pdf[] = $linea_pdf;
+		$contador++;
+	}
+}
+?>
             </TBODY>
         </TABLE>
-            <?php 
-                if($total_calls2>0) {
-                print_exports($header_pdf,$data_pdf,$width_pdf,$title_pdf,$cover_pdf);
-                }
-            ?>
+            <?php if ($total_calls2 > 0) {
+	print_exports($header_pdf, $data_pdf, $width_pdf, $title_pdf, $cover_pdf);
+}
+?>
 
-        <BR>    
-            <?php
-            if($total_calls2>0) {
-                echo "<TABLE width='99%' cellpadding=3 cellspacing=3 border=0>\n";
-                echo "<THEAD>\n";
-                echo "<TR><TD align=center bgcolor='#fffdf3' width='100%'>\n";
-                echo "</TD><TD align=center bgcolor='#fffdf3' width='100%'>\n";
-                echo "</TD></TR>\n";
-                echo "</THEAD>\n";
-                echo "</TABLE><BR>\n";
-            }
-            ?>
+        <br/>
+<TABLE width='99%' cellpadding=3 cellspacing=3 border=0>
+<THEAD>
+<TR>
+<TD align=center bgcolor='#ffffff' width='50%'>
+ <script type="text/javascript">
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+	  <?php
+echo "[\"Agent\", \"Dur\", {role: \"style\"}],\n";
+foreach ($total_time2 as $key => $val) {
+	$dur = ceil($val / 60);
+	echo "[\"" . $key . "\", " . $dur . ", \"orangered\"],\n";
+}
+?>
+      ]);
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
 
-            <a name='2'></a>
-            <TABLE width='99%' cellpadding=3 cellspacing=3 border=0 >
-            <CAPTION>
-            <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16 
-            <?php 
-            tooltip($lang["$language"]['gotop'],200);
-            ?>
-            ></a>&nbsp;&nbsp;
-            <?php echo $lang["$language"]['call_response']?></CAPTION>
-            <THEAD>
-            <TR>
-            <TD valign=top width='50%' bgcolor='#fffdf3'>
-                <TABLE width='99%' cellpadding=1 cellspacing=1 border=0 class='sortable' id='table2'>
-                <THEAD>
-                <TR> 
-                  <TH><?php echo $lang["$language"]['answer']?></TH>
-                  <TH><?php echo $lang["$language"]['count']?></TH>
-                  <TH><?php echo $lang["$language"]['delta']?></TH>
-                  <TH><?php echo $lang["$language"]['percent']?></TH>
-                </TR>
-                </THEAD>
-                <TBODY>
-                <?php
-                $countrow=0;
-                $partial_total = 0;
-                $query2="";
-                $total_y_transfer = $answer['15'] + $answer['30'] +  $answer['45'] + $answer['60'] +  $answer['75'] + $answer['90'] +  $answer['91+'];
-                foreach($answer as $key=>$val)
-                {
-                    $newcont = $countrow+1;
-                    $query2.="val$newcont=$val&var$newcont=$key%20".$lang["$language"]['secs']."&";
-                    $cual = ($countrow%2);
-                    if($cual>0) { $odd = " class='odd' "; } else { $odd = ""; }
-                    echo "<TR $odd>\n";
-                    echo "<TD>".$lang["$language"]['within']."$key ".$lang["$language"]['secs']."</TD>\n";
-                    $delta = $val;
-                    if($delta > 0) { $delta = "+".$delta;}
-                    $partial_total += $val;
-                    if($total_y_transfer > 0) {
-                    $percent=$partial_total*100/$total_y_transfer;
-                    } else {
-                    $percent = 0;
-                    }
-                    $percent=number_format($percent,2);
-                    if($countrow==0) { $delta = ""; }
-                    echo "<TD>$partial_total ".$lang["$language"]['calls']."</TD>\n";
-                    echo "<TD>$delta</TD>\n";
-                    echo "<TD>$percent ".$lang["$language"]['percent']."</TD>\n";
-                    echo "</TR>\n";
-                    $countrow++;
-                }
-                $query2.="title=".$lang["$language"]['call_response']."$graphcolor";
-                ?>
-                </TBODY>
-              </TABLE>
-              </TD>
-                <TD valign=top width="50%" align=center  bgcolor='#fffdf3'>
-                <?php
-                ?>
-                </TD>
+      var options = {
+        title: <?php echo json_encode($lang["$language"]['agent_in_call_dur']); ?>,
+        bar: {groupWidth: "75%"},
+        legend: { position: "none" },
+      };
+      var chart = new google.visualization.ColumnChart(document.getElementById("dur_by_agent"));
+      chart.draw(view, options);
+  }
+
+    </script>
+
+    <div id="dur_by_agent"></div>
+</TD>
+<TD align=center bgcolor='#ffffff' width='50%'>
+<script type="text/javascript">
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+	  <?php
+echo "[\"Agent\", \"Calls\", {role: \"style\"}],\n";
+foreach ($total_calls2 as $key => $val) {
+	echo "[\"" . $key . "\", " . $val . ", \"naviblue\"],\n";
+}
+?>
+      ]);
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
+
+      var options = {
+        title: <?php echo json_encode($lang["$language"]['answered_calls_by_agent']); ?>,
+        bar: {groupWidth: "75%"},
+        legend: { position: "none" },
+      };
+      var chart = new google.visualization.ColumnChart(document.getElementById("ans_by_agent"));
+      chart.draw(view, options);
+  }
+</script>
+    <div id="ans_by_agent"></div>
+	          </TD>
             </TR>
             </THEAD>
           </TABLE>
-          <BR>
-            <a name='3'></a>
-            <TABLE width='99%' cellpadding=3 cellspacing=3 border=0>
-            <CAPTION>
-            <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16 
-
-            <?php 
-            tooltip($lang["$language"]['gotop'],200);
-            ?>
+          <BR/>
+            <a name='resp'></a>
+            <table width='99%' cellpadding=3 cellspacing=3 border=0 >
+            <caption>
+            <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16
+            <?php
+tooltip($lang["$language"]['gotop'], 200);
+?>
             ></a>&nbsp;&nbsp;
-            <?php echo $lang["$language"]['answered_calls_by_queue']?></CAPTION>
-            <THEAD>
-            <TR>
-            <TD valign=top width='50%'  bgcolor='#fffdf3'  >
-                <TABLE width='99%' cellpadding=1 cellspacing=1 border=0 class='sortable' id='table3' >
-                <THEAD>
-                <TR> 
-                    <TH><?php echo $lang["$language"]['queue']?></TH>
-                    <TH><?php echo $lang["$language"]['count']?></TH>
-                    <TH><?php echo $lang["$language"]['percent']?></TH>
-                </TR>
-                </THEAD>
-                <TBODY>
-                <?php
-                $countrow=0;
-                $query2="";
-                if(count($total_calls_queue)==0) {
-                        $total_calls_queue[""]=0;
-                }
-                asort($total_calls_queue);
-                foreach($total_calls_queue as $key=>$val) {
-                    $cual = $countrow%2;
-                    if($cual>0) { $odd = " class='odd' "; } else { $odd = ""; }
-                    if($total_calls>0) {
-                    $percent = $val * 100 / $total_calls;
-                    } else {
-                    $percent=0;
-                    }
-                    $percent =number_format($percent,2);
-                    echo "<TR $odd><TD>$key</TD><TD>$val ".$lang["$language"]['calls']."</TD><TD>$percent %</TD></TR>\n";
-                    $countrow++;
-                    $query2.="var$countrow=$key&val$countrow=$val&";
-                }
-                $query2.="title=".addslashes($lang[$language]['answered_calls_by_queue'])."$graphcolor";
-                ?>
-              </TBODY>
-              </TABLE>
-            </TD>
-            </TR>
-            </THEAD>
-            </TABLE>
-            <BR>
+            <?php echo $lang["$language"]['call_response'] ?></caption>
+            <thead>
+            <tr>
 
-            <a name='4'></a>
-            <TABLE width='99%' cellpadding=3 cellspacing=3 border=0>
-            <CAPTION>
-            <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16 
+                <td valign=top width="50%" align=center  bgcolor='#ffffff'>
+				 <table width='99%' cellpadding=1 cellspacing=1 border=0 class='sortable' id='tableresp'>
+				<thead>
+                <tr>
+				   	<TH><?php echo $lang["$language"]['queue'] ?></th>
+					<TH><?php echo $lang["$language"]['5sec'] ?></th>
+					<TH><?php echo $lang["$language"]['_10sec'] ?></th>
+					<TH><?php echo $lang["$language"]['15sec'] ?></th>
+					<TH><?php echo $lang["$language"]['_20sec'] ?></th>
+					<TH><?php echo $lang["$language"]['25sec'] ?></th>
+					<TH><?php echo $lang["$language"]['30sec'] ?></th>
+					<TH><?php echo $lang["$language"]['31sec'] ?></th>
+					<TH><?php echo $lang["$language"]['ALLS'] ?></th>
+                </tr>
+				</thead>
+				<tbody>
+<?php
+foreach ($hold as $key => $row) {
+	$total_ans15 += $hold15["$key"];
+	$total_ans30 += $hold30["$key"];
+	$total_ans45 += $hold45["$key"];
+	$total_ans60 += $hold60["$key"];
+	$total_ans75 += $hold75["$key"];
+	$total_ans90 += $hold90["$key"];
+	$total_ans91 += $hold91["$key"];
+	$total = count($hold["$key"]);
+	echo "<tr><td>" . $key . "</td>
+	<td>" . $hold15["$key"] . "</td>
+	<td>" . $hold30["$key"] . "</td>
+	<td>" . $hold45["$key"] . "</td>
+	<td>" . $hold60["$key"] . "</td>
+	<td>" . $hold75["$key"] . "</td>
+	<td>" . $hold90["$key"] . "</td>
+	<td>" . $hold91["$key"] . "</td>
+	<td>" . $total . "</td></tr>\n";
+}
+?>
+			   </tbody>
+			  </table>
+			</td>
+			 <td valign=top width='50%' bgcolor='#ffffff'>
 
-            <?php 
-            tooltip($lang["$language"]['gotop'],200);
-            ?>
+<script type="text/javascript">
+google.charts.load('current', {packages: ['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawBasic);
+    function drawBasic() {
+    var data = new google.visualization.DataTable();
+      data.addColumn('number', 'Period');
+      data.addColumn('number', '');
+      data.addRows([
+     <?php
+
+echo "[0, 0],[5, " . $total_ans15 . "],[10, " . $total_ans30 . "],[15, " . $total_ans45 . "],[20, " . $total_ans60 . "],[25, " . $total_ans75 . "],[30, " . $total_ans90 . "],[31, " . $total_ans91 . "],\n";
+?>
+      ]);
+  var options = {
+        title: <?php echo json_encode($lang["$language"]['call_response']); ?>,
+        hAxis: {
+          title: '<?php echo json_encode($lang["$language"]['period']); ?>'
+        },
+        vAxis: {
+          title: '<?php echo json_encode($lang["$language"]['count']); ?>'
+        }
+      };
+      var chart = new google.visualization.LineChart(document.getElementById('ans_serv_level'));
+      chart.draw(data, options);
+    }
+</script>
+<div id="ans_serv_level"></div>
+               </td>
+              </tr>
+             </thead>
+            </table>
+		  <br/>
+		  <a name='durper'></a>
+		  <table width='99%' cellpadding=3 cellspacing=3 border=0 >
+            <caption>
+            <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16
+            <?php
+tooltip($lang["$language"]['gotop'], 200);
+?>
             ></a>&nbsp;&nbsp;
-            <?php echo $lang["$language"]['disconnect_cause']?></CAPTION>
-            <THEAD>
-            <TR>
-            <TD valign=top width='50%'  bgcolor='#fffdf3' >
-                <TABLE width='99%' cellpadding=1 cellspacing=1 border=0 class='sortable' id='table4'>
-                <THEAD>
-                <TR>
-                    <TH><?php echo $lang["$language"]['cause']?></TH>
-                    <TH><?php echo $lang["$language"]['count']?></TH>
-                    <TH><?php echo $lang["$language"]['count']?></TH>
-                </TR>
-                </THEAD>
-                <TBODY>
-                <TR> 
-                  <TD><?php echo $lang["$language"]['agent_hungup']?>:</TD>
-                  <TD><?php echo $hangup_cause["COMPLETEAGENT"]?> <?php echo $lang["$language"]['calls']?></TD>
-                  <TD>
-                      <?php
-                        if($total_hangup > 0 ) {
-                            $percent=$hangup_cause["COMPLETEAGENT"]*100/$total_hangup;
-                        } else {
-                            $percent=0;
-                        }
-                        $percent=number_format($percent,2);
-                        echo $percent;
-                      ?> 
-                   <?php echo $lang["$language"]['percent']?></TD>
-                </TR>
-                <TR> 
-                  <TD><?php echo $lang["$language"]['caller_hungup']?>:</TD>
-                  <TD><?php echo $hangup_cause['COMPLETECALLER']?> <?php echo $lang["$language"]['calls']?></TD>
-                  <TD>
-                      <?php
-                        if($total_hangup > 0 ) {
-                            $percent=$hangup_cause["COMPLETECALLER"]*100/$total_hangup;
-                        } else {
-                            $percent=0;
-                        }
-                        $percent=number_format($percent,2);
-                        echo $percent;
-                      ?> 
-                    <?php echo $lang["$language"]['percent']?></TD>
-                </TR>
-                </TBODY>
-              </TABLE>
-            </TD>
-            <TD align=center  bgcolor='#fffdf3'>
-                <?php
-                $query2 = "var1=".$lang["$language"]['agent']."&val1=".$hangup_cause["COMPLETEAGENT"]."&";
-                $query2 .= "var2=".$lang["$language"]['caller']."&val2=".$hangup_cause["COMPLETECALLER"];
-                $query2.="&title=".$lang["$language"]['disconnect_cause']."$graphcolor2";
-                ?>
-            </TD>
-            </TR>
-            </THEAD>
-            </TABLE>
+            <?php echo $lang["$language"]['dur_by_period'] ?></caption>
+            <thead>
+            <tr>
 
-            <BR>
+                <td valign=top width="50%" align=center  bgcolor='#ffffff'>
+				<table width='99%' cellpadding=1 cellspacing=1 border=0 class='sortable' id='tabledurper'>
+				 <thead>
+                  <tr>
+				   	<TH><?php echo $lang["$language"]['queue'] ?></th>
+					<TH><?php echo $lang["$language"]['0-5sec'] ?></th>
+					<TH><?php echo $lang["$language"]['6-10sec'] ?></th>
+					<TH><?php echo $lang["$language"]['11-15sec'] ?></th>
+					<TH><?php echo $lang["$language"]['16-20sec'] ?></th>
+					<TH><?php echo $lang["$language"]['21-25sec'] ?></th>
+					<TH><?php echo $lang["$language"]['26sec'] ?></th>
+                 </tr>
+				</thead>
+				<tbody>
+                <?php
+foreach ($durall as $key => $row) {
+	$total_dur5 += $dur5["$key"];
+	$total_dur10 += $dur10["$key"];
+	$total_dur15 += $dur15["$key"];
+	$total_dur20 += $dur20["$key"];
+	$total_dur25 += $dur25["$key"];
+	$total2 = count($durall["$key"]);
+	$total25 = $dur5["$key"] + $dur10["$key"] + $dur15["$key"] + $dur20["$key"] + $dur25["$key"];
+	$total26 = $total2 - $total25;
+	echo "<tr><td>" . $key . "</td>
+	<td>" . $dur5["$key"] . "</td>
+	<td>" . $dur10["$key"] . "</td>
+	<td>" . $dur15["$key"] . "</td>
+	<td>" . $dur20["$key"] . "</td>
+	<td>" . $dur25["$key"] . "</td>
+	<td>" . $total26 . "</td>
+	</tr>\n";
+}
+?>
+			  </tbody>
+			 </table>
+			</td>
+			<td valign=top width='50%' bgcolor='#ffffff'>
+<script type="text/javascript">
+google.charts.load('current', {packages: ['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawBasic);
+    function drawBasic() {
+    var data = new google.visualization.DataTable();
+      data.addColumn('number', 'Period');
+      data.addColumn('number', '');
+
+      data.addRows([
+     <?php
+echo "[0, 0],[5, " . $total_dur5 . "],[10, " . $total_dur10 . "],[15, " . $total_dur15 . "],[20, " . $total_dur20 . "],[25, " . $total_dur25 . "],\n";
+?>
+      ]);
+      var options = {
+	    title: <?php echo json_encode($lang["$language"]['dur_by_period']); ?>,
+        hAxis: {
+          title: '<?php echo json_encode($lang["$language"]['period']); ?>'
+        },
+        vAxis: {
+          title: '<?php echo json_encode($lang["$language"]['count']); ?>'
+        }
+      };
+      var chart = new google.visualization.LineChart(document.getElementById('ans_dur_period'));
+      chart.draw(data, options);
+    }
+</script>
+            <div id="ans_dur_period"></div>
+            </td>
+            </tr>
+            </thead>
+          </table>
+          <br/>
+           <a name='4'></a>
+            <table width='99%' cellpadding=3 cellspacing=3 border=0>
+            <caption>
+            <a href='#0'><img src='images/go-up.png' border=0 class='icon' width=16 height=16
 
             <?php
-            if($totaltransfers>0) {
-            ?>
-            <TABLE width='99%' cellpadding=1 cellspacing=1 border=0 class='sortable' id='table5'>
-            <CAPTION><?php echo $lang["$language"]['transfers']?></CAPTION>
-            <THEAD>
-            <TR>
-                 <TH><?php echo $lang["$language"]['agent']?></TH>
-                 <TH><?php echo $lang["$language"]['to']?></TH>
-                 <TH><?php echo $lang["$language"]['count']?></TH>
-            </TR>
-            </THEAD>
-            <TBODY>
-            <?php
-            foreach($transfers as $key=>$val) {
-                $partes = explode("\^",$key);
-                $agent = $partes[0];
-                $extension = $partes[1];
-                echo "<TR>\n";
-                echo "<TD>$agent</TD>\n";
-                echo "<TD>$extension</TD>\n";
-                echo "<TD>$val</TD>\n";
-                echo "</TR>";
-            }
-            ?>
-            </TBODY>
-            </TABLE>
-        <?php } ?>
+tooltip($lang["$language"]['gotop'], 200);
+?>
+            ></a>&nbsp;&nbsp;
+            <?php echo $lang["$language"]['disconnect_cause'] ?></caption>
+              </table>
+              <br/>
+            <td align=center  bgcolor='#ffffff'>
+	<script type="text/javascript">
+	  var hangcause = <?php echo json_encode($lang["$language"]['disconnect_cause']); ?>;
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+<?php
+echo "['Cause', 'Events'],\n";
+foreach ($res as $row) {
+	if ($row['event'] == "COMPLETEAGENT") {
+		$action_agent = $lang["$language"]['agent_hungup'];
+		$num += count($row['event']);
+	} elseif ($row['event'] == "COMPLETECALLER") {
+		$action_caller = $lang["$language"]['caller_hungup'];
+		$num2 += count($row['event']);
+	}
+}
+echo "['" . $action_agent . "', " . $num . "],['" . $action_caller . "', " . $num2 . "]\n";
+mysqli_free_result($res);
+?>
+        ]);
+        var options = {
+          title: <?php echo json_encode($lang["$language"]['disconnect_cause']); ?>
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('ans_disc_cause'));
+        chart.draw(data, options);
+      }
+    </script>
+    <div id="ans_disc_cause" style="width: 450px;"></div>
+
+</td>
+</tr>
+</thead>
+</table>
+
 </div>
 </div>
-</div>
-<script type="text/javascript" src="js/wz_tooltip.js"></script>
+
+<div id='footer'><a href='https://t.me/bekhzad_94'>Promoted by Bekhzad Khamidullaev</a> 2023</div>
 </body>
 </html>

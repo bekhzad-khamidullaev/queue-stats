@@ -75,7 +75,7 @@ var $PDFVersion;         //PDF version number
 *                               Public methods                                 *
 *                                                                              *
 *******************************************************************************/
-function FPDF($orientation='P',$unit='mm',$format='A4')
+function FPDF($orientation='P',$unit='mm',$format='A3')
 {
 	//Some checks
 	$this->_dochecks();
@@ -101,9 +101,10 @@ function FPDF($orientation='P',$unit='mm',$format='A4')
 	$this->FillColor='0 g';
 	$this->TextColor='0 g';
 	$this->ColorFlag=false;
+	//$this->AddFont('Arial','','arialuni.php');
 	$this->ws=0;
 	//Standard fonts
-	$this->CoreFonts=array('courier'=>'Courier','courierB'=>'Courier-Bold','courierI'=>'Courier-Oblique','courierBI'=>'Courier-BoldOblique',
+	$this->CoreFonts=array('ArialMT' => 'Arial', 'courier'=>'Courier','courierB'=>'Courier-Bold','courierI'=>'Courier-Oblique','courierBI'=>'Courier-BoldOblique',
 		'helvetica'=>'Helvetica','helveticaB'=>'Helvetica-Bold','helveticaI'=>'Helvetica-Oblique','helveticaBI'=>'Helvetica-BoldOblique',
 		'times'=>'Times-Roman','timesB'=>'Times-Bold','timesI'=>'Times-Italic','timesBI'=>'Times-BoldItalic',
 		'symbol'=>'Symbol','zapfdingbats'=>'ZapfDingbats');
@@ -667,9 +668,14 @@ function Cell($w,$h=0,$txt='',$border=0,$ln=0,$align='',$fill=0,$link='')
 	}
 	if($txt!=='')
 	{
+		//$txt = iconv('utf-8', 'cp1251', $txt);
+		if (mb_detect_encoding($txt, 'UTF-8', false)){
+            $txt = iconv('UTF-8', 'cp1251', $txt);
+
+        }
 		if($align=='R')
 			$dx=$w-$this->cMargin-$this->GetStringWidth($txt);
-		elseif($align=='C')
+		elseif($align=='R')
 			$dx=($w-$this->GetStringWidth($txt))/2;
 		else
 			$dx=$this->cMargin;

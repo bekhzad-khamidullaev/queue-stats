@@ -43,10 +43,10 @@ function swf_bar($values,$width,$height,$divid,$stack) {
    fo.addParam("wmode", "transparent");
 //   fo.addParam("salign", "t");
 	<?php
-		$variables = explode("&",$values);
+		$variables = split("&",$values);
 		foreach ($variables as $deauna) {
 			echo "//$deauna\n";
-			$pedazos = explode("=",$deauna);
+			$pedazos = split("=",$deauna);
 			echo "fo.addVariable('".$pedazos[0]."','".$pedazos[1]."');\n";
 		}
 	?>
@@ -61,9 +61,10 @@ function tooltip($texto,$width) {
 }
 
 
-function print_exports($header_pdf,$data_pdf,$width_pdf,$title_pdf,$cover_pdf) {
+function print_exports($header_pdf,$data_pdf,$width_pdf,$title_pdf,$cover_pdf,$header_csv) {
 		global $lang;
 		global $language;
+		$headcsv_serial = serialize($header_csv);
 		$head_serial = serialize($header_pdf);
 		$data_serial = serialize($data_pdf);
 		$width_serial = serialize($width_pdf);
@@ -76,15 +77,16 @@ function print_exports($header_pdf,$data_pdf,$width_pdf,$title_pdf,$cover_pdf) {
 		$cover_serial = rawurlencode($cover_serial);
 		echo "<BR><form method=post action='export.php'>\n";
 		echo $lang["$language"]['export'];
+		echo "<input type='hidden' name='headcsv' value='".$headcsv_serial."' />\n";
 		echo "<input type='hidden' name='head' value='".$head_serial."' />\n";
 		echo "<input type='hidden' name='rawdata' value='".$data_serial."' />\n";
 		echo "<input type='hidden' name='width' value='".$width_serial."' />\n";
 		echo "<input type='hidden' name='title' value='".$title_serial."' />\n";
 		echo "<input type='hidden' name='cover' value='".$cover_serial."' />\n";
-//		echo "<input type=image name='pdf' src='images/pdf.gif' ";
-//		tooltip($lang["$language"]['pdfhelp'],200);
-//		echo ">\n";
-		echo "<input type=image name='csv' src='images/excel.gif' "; 
+		echo "<input type=image name='pdf' src='images/pdf.gif' ";
+		tooltip($lang["$language"]['pdfhelp'],200);
+		echo ">\n";
+		echo "<input type=image name='csv' src='images/excel.png' "; 
 		tooltip($lang["$language"]['csvhelp'],200);
 		echo ">\n";
 		echo "</form>";

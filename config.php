@@ -1,32 +1,64 @@
 <?php
-require_once("dblib.php");
-require_once("misc.php");
+require_once "misc.php";
 
-// Credentials for MYSQL database
-$dbhost = 'localhost';
-$dbname = 'asterisk';
-$dbuser = 'asterisk';
-$dbpass = 'somepass';
+$DBServer = '192.168.88.197';
+$DBUser = 'asterisk';
+$DBPass = 't3sl@admin';
+$DBName = 'asterisk_db';
+$DBTable = 'queuelog';
 
-// Credentials for AMI (for the realtime tab to work)
-// See /etc/asterisk/manager.conf
+define('RECPATH',"/var/spool/asterisk/monitor/");
 
-$manager_host   = "127.0.0.1";
-$manager_user   = "admin";
-$manager_secret = "somepass";
+$connection = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
+$connection->set_charset('utf8');
 
-// Available languages "es", "en", "ru", "de", "fr"
+// check connection
+if ($connection->connect_error) {
+	trigger_error('Database connection failed: ' . $connection->connect_error, E_USER_ERROR);
+}
+
+//$confpbx = new mysqli('192.168.88.197', 'asterisk', 't3sl@admin', 'asterisk');
+//$confpbx->set_charset('utf8');
+
+
+//$user = $_SERVER['PHP_AUTH_USER'];
+//$pass = $_SERVER['PHP_AUTH_PW'];
+
+//$valid_passwords2 = $confpbx->query("SELECT password_sha1 FROM ampusers WHERE username = '$user'");
+//$valid_passwords = $valid_passwords2->fetch_row();
+
+//$validated = (sha1($pass) == $valid_passwords[0]);
+
+//if (!$validated) {
+//	header('WWW-Authenticate: Basic realm="fs-tst"');
+//	header('HTTP/1.0 401 Unauthorized');
+//	die("Not authorized");
+//}
+
+//$valid_passwords2->free();
+
+//AJAM for realtime. For use: webenable=yes; mini-http enable; 
+
+$config['urlraw'] = 'http://127.0.0.1:8088/rawman';
+$config['admin'] = 'ajamuser';
+$config['secret'] = 't3sl@admin';
+$config['authtype'] = 'plaintext';
+$config['cookiefile'] = 'ajam_cookie';
+$config['debug'] = false;
+
+
+// Available languages "en", "ru"
 $language = "ru";
 
-require_once("lang/$language.php");
+require_once "lang/$language.php";
 
-$midb = conecta_db($dbhost,$dbname,$dbuser,$dbpass);
+$page_rows = '100';
+//$midb = conecta_db($dbhost,$dbname,$dbuser,$dbpass);
 $self = $_SERVER['PHP_SELF'];
 
 $DB_DEBUG = false;
 
 session_start();
-//session_register("QSTATS");
-header('content-type: text/html; charset: utf-8'); 
+header('content-type: text/html; charset: utf-8');
 
 ?>
