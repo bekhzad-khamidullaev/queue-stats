@@ -402,8 +402,9 @@ Handlebars.registerHelper('l10n', function(keyword) {
         <div id="main">
         <div id="contents">
             <div>
-                <a href="agents.php">Агенты</a>
+                <a href="queues.php"><b>Очереди</b></a>
                 <a href="calls.php">Вызовы</a>
+                <a href="agents.php">Aгенты</a>
             </div>
             <br/>
         <div class="queuesum-placeholder">null</div>

@@ -2,7 +2,6 @@ table {
     font-family: open sans,roboto,sans-serif;
     border-collapse: collapse;
     width: 99%;
-	border-radius: 3px;
 }
 
 @media (max-width:800px) { 
@@ -48,16 +47,17 @@ caption {
 
 thead {
 	background-color: #fff;
-	border: none;
+	border: solid #ccc;
 }
 thead tr th {
 	height: 32px;
-	background: #607D8B;
+	background: #0058a3;
 	color: white;
 	text-align: center;
 	word-wrap: break-word;
 	white-space: pre-wrap;
-	border-collapse: collapse;s
+	border-collapse: collapse;
+	border-radius: 3px;
 }
 /* BODY */
 
@@ -80,7 +80,7 @@ tbody tr th, tbody tr td {
 	border: 1px solid black;
 }
 tbody tr th {
-	background: #1c5d79;
+	background: #0058a3;
 	font-family: open sans,roboto,sans-serif;	
 	font-size: 100%;
 	padding: 6px;
@@ -117,7 +117,7 @@ tfoot {
 	color: #555d6d;
 	text-align: center;
 	letter-spacing: 3px;
-	border-top: solid 2px #326e87;
+	border-top: solid 2px #0058a3;
 	border-bottom: dashed 1px #c2c2c2;
 }
 tfoot tr th, tfoot tr td {
@@ -125,7 +125,7 @@ tfoot tr th, tfoot tr td {
 	
 }
 tfoot tr th {
-	border-top: solid 1px #326e87;
+	border-top: solid 1px #0058a3;
 }
 tfoot tr td {
 	text-align: right;

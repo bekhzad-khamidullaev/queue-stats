@@ -300,6 +300,7 @@ Handlebars.registerHelper('l10n', function(keyword) {
             <div>
                 <a href="queues.php">Очереди</a>
                 <a href="calls.php">Вызовы</a>
+                <a href="agents.php"><b>Aгенты</b></a>
             </div>
             <br/>
         <div class="queues-placeholder">null</div>
