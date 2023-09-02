@@ -1,69 +1,90 @@
 html { min-width: 600px; }
 
 body {
-	font-size: 14px;
-    font-family: open sans,roboto,sans-serif;
+  font-size: 14px;
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+  color: #333;
 }
-
 div, caption, td, th, h2, h3, h4 { /* redundant rules for bad browsers  */  
-	font-size: 14px;
+  font-size: 14px;
     font-family: open sans,roboto,sans-serif;
-	voice-family: "\"}\"";
-	voice-family: inherit;
-	color: #333;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  color: #333;
 }  
 .clearhack { display: inline; } /*Clears Box Model Hack in IE5*/
 
 body {
-	background: #fff;
-	color: #333;
-	margin: 0; /* margin and padding only necessary to cater for Mac IE5 */
-	padding: 0;
+  background: #fff;
+  color: #333;
+  margin: 0; /* margin and padding only necessary to cater for Mac IE5 */
+  padding: 0;
 }
 
-a { color: #06C; }
-a:hover { color: #333; }
-a:active { color: #000; }
+a {
+  color: #0078d4;
+  text-decoration: none;
+}
 
-p { line-height: 140%; }
+a:hover {
+  color: #004e8c;
+}
 
-h1,h2 {
-	font-family: trebuchet ms;
-	font-weight: bold;
-	color: #333;
+a:active {
+  color: #002b49;
+}
+
+p {
+  line-height: 140%;
+}
+
+h1, h2 {
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  color: #333;
 }
 
 h1 {
-	font-size: 180%;
-	margin: 0;
+  font-size: 24px;
+  margin: 0;
 }
 
-h1 a { text-decoration: none; color: #333; }
-h1 a:hover { border-bottom: 1px dotted #666; color: #000; }
+h1 a {
+  text-decoration: none;
+  color: #333;
+}
+
+h1 a:hover {
+  border-bottom: 1px dotted #666;
+  color: #000;
+}
 
 h2 {
-	font-size: 140%;
-	padding-bottom: 2px;
-	padding-top: 15px;
-	border-bottom: 1px solid #CCC;
-	margin: 0;
+  font-size: 18px;
+  padding-bottom: 2px;
+  padding-top: 15px;
+  border-bottom: 1px solid #CCC;
+  margin: 0;
 }
 
 p.note {
-	background: #EEE;
-	padding: 4px;
-	font-family: tahoma;
-	font-size: 85%;
-	line-height: 130%;
-	margin-top: 0;
+  background: #EEE;
+  padding: 4px;
+  font-family: 'Tahoma', Arial, Helvetica, sans-serif;
+  font-size: 85%;
+  line-height: 130%;
+  margin-top: 0;
 }
 
 #icon {
-	width: 16px;
-	height: 16px;
-	padding: 0;
-	margin-top: 12px;
-	margin-bottom: 12px;
+  width: 14px;
+  height: 16px;
+  padding: 0;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 #rest {
@@ -75,8 +96,8 @@ p.note {
   width:45%;
 }
 #right {
-	width: 45%;
-	float: right;
+  width: 45%;
+  float: right;
 }
 
 
@@ -96,69 +117,40 @@ html, body {
        height: 4em;
 }
 #footer {
-	text-align: center;
+  text-align: center;
 }
 
 body {
   background-color: #000000;
 }
 
-
 .text-danger {
-	color: firebrick;
+  color: #d32f2f;
 }
 
 .text-success {
-	color: green;
+  color: #388e3c;
 }
-
-.text-sexess {
-	color: mediumseagreen;
-	font-weight: bold;
-}
-
 
 .text-muted {
-	color: lightgrey;
+  color: #666;
 }
 
 .text-info {
-	color: royalblue;
+  color: #1976d2;
 }
 
 .text-warning {
-	color: orange;
-}
-
-.text-peru {
-	color: peru;
-}
-
-.text-sadbrown {
-	color: saddlebrown;
-}
-
-
-.text-rblue {
-	color: royalblue;
-}
-
-.text-dimgray {
-	color: dimgray;
-}
-
-.text-indred {
-	color: indianred;
-	font-weight: bold;
-
+  color: #ff9800;
 }
 
 .btn-danger {
-	color: white;
-	background-color: firebrick;
-	font-family: "Times New Roman", Times, serif;
-	font-size: .9rem;
+  color: white;
+  background-color: #d32f2f;
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
 }
+
 /* Give the player a height & width of 0. Otherwise the player is visible on mobile devices (tested on iPhone 5). */
 /*#player {
  width: 100%;
