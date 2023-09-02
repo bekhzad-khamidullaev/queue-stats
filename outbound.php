@@ -25,7 +25,7 @@ include "sesvars.php";
 <?php
 //query mixed from queuelog and cdr (queuelog table must be in cdr databases)
 $sql = "select calldate, uniqueid, billsec, disposition, src, dst, cnum, cnam, recordingfile from cdr where calldate >= '$start' AND calldate <= '$end' AND `cnam` in ($agent);";
-// print $sql;exit;
+
 $res = $connection->query($sql);
 
 $out = array();
@@ -53,11 +53,11 @@ $connection->close();
 
 function getRec($recfile, $time) {
 	$time = strtotime($time);
-
-	if (file_exists($recfile)) {
-		$tmpRes = base64_encode($recfile);
+	$rec['path'] = $recfile;
+	if (file_exists($rec['path']) && preg_match('/(.*)\..+$/i', $recfile)) {
+		$tmpRes = base64_encode($rec['path']);
 	} else {
-		$tmpRes = !empty($_REQUEST['recfile'])?$_REQUEST['recfile']:"";
+		$tmpRes = $_REQUEST['recfile'];
 	}
 	return $tmpRes;
 }
@@ -283,13 +283,13 @@ Handlebars.registerHelper("getStatus", function (s) {
       <h2>Детализация</h2>
       <br/>
 <?php
-//print_exports($header_pdf, $data_pdf, $width_pdf, $title_pdf, $cover_pdf);
+print_exports($header_pdf, $data_pdf, $width_pdf, $title_pdf, $cover_pdf);
 ?>
         <br/>
         <hr/>
       <div class="out-placeholder"></div>
     </div>
 </div>
-  <div id='footer'><a href='https://t.me/bekhzad_94'>Promoted by Bekhzad Khamidullaev</a> 2023</div>
+<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2021</div>
 </body>
 </html>

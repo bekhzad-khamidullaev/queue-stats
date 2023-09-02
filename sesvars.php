@@ -94,7 +94,6 @@ $timestamp_end   = return_timestamp($end);
 $elapsed_seconds = $timestamp_end - $timestamp_start;
 $period          = floor(($elapsed_seconds / 60) / 60 / 24) + 1; 
 
-
 if(!isset($_SESSION['QSTATS']['start'])) {
 	if(basename($self)<>"index.php") {
 		Header("Location: ./index.php");

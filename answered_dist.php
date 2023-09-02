@@ -338,6 +338,6 @@ echo "['".$action."', ".$num."],['".$action2."', ".$num2."]\n";
 		  
 </div>
 </div>
-  <div id='footer'><a href='https://t.me/bekhzad_94'>Promoted by Bekhzad Khamidullaev</a> 2023</div>
+<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2021</div>
 </body>
 </html>

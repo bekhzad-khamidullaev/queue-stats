@@ -57,15 +57,13 @@ $connection->close();
 
 function getRec($recfile, $time) {
 	$time = strtotime($time);
-	for($i=0;$i<5;$i++)
-    {
-        $recfile = str_replace(["///","//"],["/","/"], $recfile);
-    }
-	if (file_exists($recfile) ) {
-		$tmpRes = base64_encode($recfile);
+	$rec['path'] =  $recfile;        
+	if (file_exists($rec['path']) && preg_match('/(.*)\..+$/i', $recfile)) {
+		$tmpRes = base64_encode($rec['path']);
 	} else {
-		$tmpRes = !empty($_REQUEST['recfile'])?$_REQUEST['recfile']:"";
+		$tmpRes = $_REQUEST['recfile'];
 	}
+
 	return $tmpRes;
 }
 
@@ -275,6 +273,6 @@ print_exports($header_pdf, $data_pdf, $width_pdf, $title_pdf, $cover_pdf);
       <div class="out-placeholder"></div>
     </div>
 </div>
-    <div id='footer'><a href='https://t.me/bekhzad_94'>Promoted by Bekhzad Khamidullaev</a> 2023</div>
+<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2021</div>
 </body>
 </html>

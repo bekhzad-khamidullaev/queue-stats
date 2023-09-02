@@ -286,6 +286,6 @@ $(document).ready(function() {
     });
 });
 </script>
-    <div id='footer'><a href='https://t.me/bekhzad_94'>Promoted by Bekhzad Khamidullaev</a> 2023</div>
+<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2019</div>
 </body>
 </html>

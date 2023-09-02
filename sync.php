@@ -1,12 +1,11 @@
 <?php
-
 require_once "config.php";
 require_once "sesvars.php";
 
 session_start();
 if (isset($_POST['agent_sync'])) {
 	$aquery = "truncate agents_new;";
-	$aquery .= "insert ignore into agents_new (agent) SELECT DISTINCT(agent) FROM $DBTable where agent != 'NONE' and agent not like 'Local%' and agent not like 'SIP%' ORDER BY agent";
+	$aquery .= "insert ignore into agents_new (agent) SELECT DISTINCT(agent) FROM $DBTable where agent != 'NONE' and agent not like 'Local%'";
 	$ares = mysqli_multi_query($connection, $aquery);
 	$_POST['agent_sync'] = NULL;
 	echo "<!DOCTYPE html>\r\n";

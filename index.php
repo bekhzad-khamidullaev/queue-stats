@@ -21,8 +21,15 @@ along with Asterisk Call Center Stats.  If not, see
 require_once "config.php";
 require_once "sesvars.php";
 
-$start_today = date('Y-m-d 00:00:00');
-$end_today = date('Y-m-d 23:59:59');
+$fstart_hour = date('H'); // Set a default value
+
+$start_today = date('Y-m-d 09:00:00');
+
+$end_today = date('Y-m-d', strtotime('+1 day')) . '03:00:00';
+// $end_today = date('Y-m-d 23:59:59');
+// $fstart_hour = date('Y-m-d 09:00:00');
+// $start_today = date('Y-m-d 00:00:00');
+// $end_today = date('Y-m-d 23:59:59');
 
 $start_dayb1 = date('Y-m-d 10:00:00', strtotime("-1 day")); // from yesterday 10:00
 $end_dayb1 = date('Y-m-d 09:59:59'); // to today 10:00
@@ -36,8 +43,6 @@ $start_today_ts = return_timestamp($start_today);
 
 $day = date('w', $start_today_ts);
 $diff_to_monday = $start_today_ts - (($day - 1) * 86400);
-
-$fstart_hour = date("H");
 
 // Start and End date for last week (it counts from the first monday back
 // till the next sunday
@@ -85,10 +90,6 @@ while ($row = mysqli_fetch_row($res)) {
 
 mysqli_close($connection);
 $res->free();
-for($i=0;$i<100;$i++)
-{
-	//$agentes[] = "PJSIP/".(1200+$i);
-}
 
 ?>
 
