@@ -55,14 +55,14 @@ if(isset($_POST['start'])) {
    $start = $_POST['start'];
    $_SESSION['QSTATS']['start']=$start;
 } else {
-   $start = date('Y-m-d 00:00:00');
+   $start = date('Y-m-d 09:00:00');
 }
 
 if(isset($_POST['end'])) {
    $end = $_POST['end'];
    $_SESSION['QSTATS']['end']=$end;
 } else {
-   $end = date('Y-m-d 23:59:59');
+   $end = date('Y-m-d 02:59:59', strtotime("+1 day"));
 }
 
 if(isset($_SESSION['QSTATS']['start'])) {

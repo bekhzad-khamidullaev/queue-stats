@@ -58,6 +58,7 @@ $lang['ru']['menu_answered'] = "Прин.";
 $lang['ru']['menu_unanswered'] = "Проп.";
 $lang['ru']['menu_distribution'] = "Распр.";
 $lang['ru']['ans_cdr'] = "Прин.выз.";
+$lang['ru']['ans_call'] = "Прин.запись.";
 $lang['ru']['unans_cdr'] = "Проп.выз.";
 $lang['ru']['compare'] = "Сравн.";
 $lang['ru']['realtime'] = "Реалтайм";

@@ -27,6 +27,7 @@ along with Asterisk Call Center Stats.  If not, see
 $menu[] = $lang["$language"]['menu_home'];
 $menu[] = $lang["$language"]['menu_answered'];
 $menu[] = $lang["$language"]['ans_cdr'];
+// $menu[] = $lang["$language"]['ans_call'];
 $menu[] = $lang["$language"]['menu_unanswered'];
 $menu[] = $lang["$language"]['unans_cdr'];
 $menu[] = $lang["$language"]['outbound'];
@@ -42,6 +43,7 @@ $menu[] = $lang["$language"]['realtime'];
 $link[] = "index.php";
 $link[] = "answered.php";
 $link[] = "answered_cdr.php";
+// $link[] = "answered_call.php";
 $link[] = "unanswered.php";
 $link[] = "unanswered_cdr.php";
 $link[] = "outbound.php";

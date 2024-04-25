@@ -1,38 +1,16 @@
 <?php
-/*
-Copyright 2017, https://asterisk-pbx.ru
-
-This file is part of Asterisk Call Center Stats.
-Asterisk Call Center Stats is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-Asterisk Call Center Stats is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Asterisk Call Center Stats.  If not, see
-<http://www.gnu.org/licenses/>.
- */
 
 require_once "config.php";
 require_once "sesvars.php";
 
-$fstart_hour = date('H'); // Set a default value
+
 
 $start_today = date('Y-m-d 09:00:00');
-
-$end_today = date('Y-m-d', strtotime('+1 day')) . '03:00:00';
-// $end_today = date('Y-m-d 23:59:59');
-// $fstart_hour = date('Y-m-d 09:00:00');
-// $start_today = date('Y-m-d 00:00:00');
-// $end_today = date('Y-m-d 23:59:59');
-
-$start_dayb1 = date('Y-m-d 10:00:00', strtotime("-1 day")); // from yesterday 10:00
-$end_dayb1 = date('Y-m-d 09:59:59'); // to today 10:00
+$end_today = date('Y-m-d 02:59:59', strtotime("+1 day"));
+$fstart_hour = date('Y-m-d 09:00:00');
+$fend_hour = date('Y-m-d 03:00:00', strtotime('+1 day'));
+$start_dayb1 = date('Y-m-d 09:00:00', strtotime("-1 day")); // from yesterday 10:00
+$end_dayb1 = date('Y-m-d 02:59:59'); // to today 10:00
 
 $start_curhour = date('Y-m-d H:00:00', strtotime("-1 hour")); // set last hour
 $end_curhour = date('Y-m-d H:59:59', strtotime("-1 hour")); // set last hour
@@ -46,12 +24,12 @@ $diff_to_monday = $start_today_ts - (($day - 1) * 86400);
 
 // Start and End date for last week (it counts from the first monday back
 // till the next sunday
-$begin_week_monday = date('Y-m-d 00:00:00', $diff_to_monday);
-$end_week_sunday = date('Y-m-d 23:59:59', ($diff_to_monday + (6 * 86400)));
+$begin_week_monday = date('Y-m-d 09:00:00', $diff_to_monday);
+$end_week_sunday = date('Y-m-d 02:59:59', ($diff_to_monday + (6 * 86400)));
 
 $end_year = date('Y');
 
-$begin_month = date('Y-m-01 00:00:00');
+$begin_month = date('Y-m-01 09:00:00');
 $begin_month_ts = return_timestamp($begin_month);
 $end_month_ts = $begin_month_ts + (86400 * 32);
 
