@@ -1,10 +1,11 @@
 <?php
 require_once "misc.php";
 
-$DBServer = '192.168.88.197';
-$DBUser = 'asterisk';
+$DBServer = '127.0.0.1';
+$DBUser = 'root';
 $DBPass = 't3sl@admin';
-$DBName = 'asterisk_db';
+$DBName = 'asteriskcdrdb';
+$DBAstName  = 'asterisk';
 $DBTable = 'queuelog';
 
 define('RECPATH',"/var/spool/asterisk/monitor/");
@@ -17,7 +18,7 @@ if ($connection->connect_error) {
 	trigger_error('Database connection failed: ' . $connection->connect_error, E_USER_ERROR);
 }
 
-//$confpbx = new mysqli('192.168.88.197', 'asterisk', 't3sl@admin', 'asterisk');
+//$confpbx = new mysqli('127.0.0.1', 'asterisk', 't3sl@admin', 'asterisk');
 //$confpbx->set_charset('utf8');
 
 
@@ -39,7 +40,7 @@ if ($connection->connect_error) {
 
 //AJAM for realtime. For use: webenable=yes; mini-http enable; 
 
-$config['urlraw'] = 'http://127.0.0.1:8088/rawman';
+$config['urlraw'] = 'http://10.10.134.62:8088/asterisk/rawman';
 $config['admin'] = 'ajamuser';
 $config['secret'] = 't3sl@admin';
 $config['authtype'] = 'plaintext';
@@ -52,7 +53,7 @@ $language = "ru";
 
 require_once "lang/$language.php";
 
-$page_rows = '100';
+$page_rows = '25';
 //$midb = conecta_db($dbhost,$dbname,$dbuser,$dbpass);
 $self = $_SERVER['PHP_SELF'];
 

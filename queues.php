@@ -369,7 +369,7 @@ Handlebars.registerHelper('l10n', function(keyword) {
                         <th scope="col">{{l10n "sts.Queue"}}</th>
                         <th>{{l10n "sts.Max"}}</th>
                         <th>{{l10n "sts.Strategy"}}</th>
-                        <!-- <th>{{l10n "sts.Calls"}}</th> -->
+                        <th>{{l10n "sts.Calls"}}</th>
                         <th>{{l10n "sts.Completed"}}</th>
                         <th>{{l10n "sts.Abandoned"}}</th>
                         <!-- <th>{{l10n "sts.Weight"}}</th> -->
@@ -383,7 +383,7 @@ Handlebars.registerHelper('l10n', function(keyword) {
                         <td>{{Queue}}</td>
                         <td>{{Max}}</td>
                         <td>{{Strategy}}</td>
-                        <!-- <td>{{Calls}}</td> -->
+                        <td>{{Calls}}</td>
                         <td>{{Completed}}</td>
                         <td>{{Abandoned}}</td>
                         <td>{{ServiceLevel}}</td>
@@ -412,7 +412,7 @@ Handlebars.registerHelper('l10n', function(keyword) {
         <br/>
     </div>
     </div>
-    <div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2021</div>
+    <div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2024</div>
 </body>
 
 </html>

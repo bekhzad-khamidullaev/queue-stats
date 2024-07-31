@@ -25,15 +25,21 @@ include "sesvars.php";
 <?php
 //query mixed from queuelog and cdr (queuelog table must be in cdr databases)
 $sql = "select calldate, uniqueid, billsec, disposition, src, dst, cnum, cnam, recordingfile from cdr where calldate >= '$start' AND calldate <= '$end' AND `cnam` in ($agent);";
-
+//$sql = "select calldate, uniqueid, billsec, disposition, src, linkedid as recordingfile, dst, src as cnum, clid as cnam from cdr where calldate >= '$start' AND calldate <= '$end' AND LENGTH(src) < 4 AND lastapp != 'Hangup';";
 $res = $connection->query($sql);
 
 $out = array();
 $rec = array();
+
+
+
+
 while ($row = $res->fetch_assoc()) {
 	$row['rec'] = getRec($row['recordingfile'], $row['calldate']);
 	$out[] = $row;
 }
+
+
 
 $header_pdf = array("Дата", "Агент", "Номер", "Назнач.", "Продолж.");
 $width_pdf = array(50, 25, 25, 25, 25);
@@ -60,6 +66,7 @@ function getRec($recfile, $time) {
 		$tmpRes = $_REQUEST['recfile'];
 	}
 	return $tmpRes;
+  
 }
 
 ?>

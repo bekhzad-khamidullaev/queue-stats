@@ -286,6 +286,6 @@ $(document).ready(function() {
     });
 });
 </script>
-<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2019</div>
+<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2024</div>
 </body>
 </html>

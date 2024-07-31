@@ -266,6 +266,6 @@ $connection->close();
     </div>
 </div>
 
-<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2021</div>
+<div id='footer'><a href='https://elastix.uz'>ELASTIX.UZ</a> 2024</div>
 </body>
 </html>
